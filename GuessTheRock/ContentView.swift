@@ -15,11 +15,15 @@ struct ContentView: View {
     @State private var appChoice = Int.random(in: 0..<3)
     @State private var shouldPlayerWin = Bool.random()
     
+    @State private var moveNumber = 1
+    @State private var endGame = false
+    
     var body: some View {
         ZStack {
             LinearGradient(colors: [.purple, .indigo, .blue], startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea()
             VStack {
+                Spacer()
                 Text("Score: \(score)")
                     .foregroundStyle(.white)
                     .font(.title.bold())
@@ -29,23 +33,40 @@ struct ContentView: View {
                 Text("You should \(shouldPlayerWin ? "win" : "lose").")
                     .foregroundStyle(.white)
                     .font(.subheadline)
-                Group {
-                    Button("🪨 Rock") {
-                        
+                Spacer()
+                VStack {
+                    Group {
+                        Button("🪨 Rock") {
+                            analyzePlayerMove(move: 0)
+                        }
+                        .font(.largeTitle.bold())
+                        Button("📄 Paper") {
+                            analyzePlayerMove(move: 1)
+                        }
+                        .font(.largeTitle.bold())
+                        Button("✂️ Scissors") {
+                            analyzePlayerMove(move: 2)
+                        }
+                        .font(.largeTitle.bold())
                     }
-                    .font(.largeTitle.bold())
-                    Button("📄 Paper") {
-                        
-                    }
-                    .font(.largeTitle.bold())
-                    Button("✂️ Scissors") {
-                        
-                    }
-                    .font(.largeTitle.bold())
+                    .buttonStyle(.bordered)
+                    .foregroundStyle(.black)
+                    .padding(.bottom)
                 }
-                .buttonStyle(.bordered)
-                .foregroundStyle(.white)
+                .padding(40)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                Spacer()
             }
+        }
+        .alert("Game over", isPresented: $endGame) {
+            Button("New game") {
+                score = 0
+                moveNumber = 0
+                nextMove()
+            }
+        } message: {
+            Text("You have scored \(score) points.")
         }
     }
     
@@ -58,6 +79,18 @@ struct ContentView: View {
         
         if !shouldPlayerWin {
             score += 1
+        }
+        
+        nextMove()
+    }
+    
+    func nextMove() {
+        moveNumber += 1
+        if moveNumber > 10 {
+            endGame = true
+        } else {
+            appChoice = Int.random(in: 0..<3)
+            shouldPlayerWin.toggle()
         }
     }
 }
